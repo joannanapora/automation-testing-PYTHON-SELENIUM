@@ -12,7 +12,7 @@ import unittest
 
 class oto_moto_search(unittest.TestCase):
 
-    def assert_quote(self, title):
+    def assert_quote(self, title):  # assertion on the first quote
         self.wait.until(EC.element_to_be_clickable(
             (By.CLASS_NAME, 'offer-title__link')))
         quote_after_sort = self.driver.find_element_by_class_name(
@@ -34,17 +34,25 @@ class oto_moto_search(unittest.TestCase):
         driver.get("https://otomoto.pl")
         self.assertIn("OTOMOTO", driver.title)
 
-        brand = driver.find_element_by_id("filter_enum_make")
+        # entering brand of car \/\/\/
+
+        brand = driver.find_element_by_id(
+            "filter_enum_make")
         brand.send_keys("BMW")
         brand.send_keys(Keys.RETURN)
 
+        # entering model of car \/\/\/
+
         self.wait_until_clickable(By.ID, "filter_enum_model")
-        model = driver.find_element_by_id("filter_enum_model")
+        model = driver.find_element_by_id(
+            "filter_enum_model")
         model.send_keys("seria 3")
         model.send_keys(Keys.RETURN)
 
         wait.until(EC.element_to_be_clickable(
             (By.ID, 'filter_enum_generation')))
+
+        # clicking search button \/\/\/
 
         search_button = driver.find_element_by_xpath(
             "//button[@class='ds-button ds-width-full']")
@@ -55,33 +63,42 @@ class oto_moto_search(unittest.TestCase):
         wait.until(EC.element_to_be_clickable(
             (By.CLASS_NAME, "select2-selection__arrow")))
 
+        # closing cookies to continue \/\/\/
+
         wait.until(EC.element_to_be_clickable(
             (By.CLASS_NAME, 'cookiesBarClose')))
         cookies = driver.find_element_by_class_name("cookiesBarClose")
         cookies.click()
 
-        price_before = driver.find_element_by_class_name("offer-item__price")
+        # checking random quote's price \/\/\/
+
+        price_before = driver.find_element_by_class_name(
+            "offer-item__price")
         price_before_sort = price_before.find_element_by_xpath(
             ".//span[1]/span[1]").text
         price_before_sort = price_before_sort.replace(" ", "")
-        print("Price of first quote before sort:", price_before_sort)
+
+        # sorting by cheapest \/\/\/
 
         show_list = driver.find_element_by_id(
             "select2-order-select-gallery-container")
         show_list.click()
-
         wait.until(EC.element_to_be_clickable(
                    (By.XPATH, "//ul[@id='select2-order-select-gallery-results']/li[3]")))
         lowest_price = driver.find_element_by_xpath(
             "//ul[@id='select2-order-select-gallery-results']/li[3]")
         lowest_price.click()
 
+        # waiting for the page to load \/\/\/
+
         pictures = driver.find_element_by_xpath(
-            "//body/div[@id='siteWrap']/div[@id='listContainer']/section[@id='body-container']/div[2]/div[1]/div[1]/div[1]/div[5]/article[1]/div[1]/a[1]/img[1]")
+            "//div[contains(@class, 'offer-item__photo  ds-photo-container')]/a")
 
         wait.until(EC.staleness_of(pictures))
 
         self.assert_quote("BMW Seria 3")
+
+        # assertion of the first quote after sorting \/\/\/
 
         first_price_details = driver.find_element_by_class_name(
             "offer-item__price")
@@ -93,12 +110,16 @@ class oto_moto_search(unittest.TestCase):
         second_price_details = driver.find_elements_by_xpath(
             "//div[contains(@class, 'offer-item__price')]")[1]
 
-        price2 = second_price_details.find_element_by_xpath(
-            ".//span[1]/span[1]").text
-        price2 = price2.replace(" ", "")
-        print("Price of second quote: ", price2)
+        # assertion of the second quote after sorting \/\/\/
 
-        # checking if sorts correctly
+        price_two = second_price_details.find_element_by_xpath(
+            ".//span[1]/span[1]").text
+        price_two = price_two.replace(" ", "")
+        print("Price of second quote: ", price_two)
+
+        # checking if SORTED CORRECTLY \/\/\/
+
+        self.assertLessEqual(int(price), int(price_before_sort))
         self.assertLessEqual(int(price), int(price2))
 
     def tear_down(self):
