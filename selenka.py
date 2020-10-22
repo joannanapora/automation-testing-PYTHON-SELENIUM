@@ -11,15 +11,21 @@ import unittest
 
 
 class oto_moto_search(unittest.TestCase):
-    
-    def assert_quote(self,title):
+
+    def assert_quote(self, title):
+        self.wait.until(EC.element_to_be_clickable(
+            (By.CLASS_NAME, 'offer-title__link')))
         quote_after_sort = self.driver.find_element_by_class_name(
             "offer-title__link")
         self.assertIn(title, quote_after_sort.text)
 
+    def wait_until_clickable(self, ByFn, path):
+        self.wait.until(EC.element_to_be_clickable(
+            (ByFn, path)))
+
     def setUp(self):
         self.driver = Chrome()
-        self.wait = WebDriverWait(self.driver, 10)
+        self.wait = WebDriverWait(self.driver, 15)
 
     def test_search_in_oto_moto(self):
         driver = self.driver
@@ -32,9 +38,8 @@ class oto_moto_search(unittest.TestCase):
         brand.send_keys("BMW")
         brand.send_keys(Keys.RETURN)
 
-        
-        model = wait.until(EC.element_to_be_clickable(
-            (By.ID, 'filter_enum_model')))
+        self.wait_until_clickable(By.ID, "filter_enum_model")
+        model = driver.find_element_by_id("filter_enum_model")
         model.send_keys("seria 3")
         model.send_keys(Keys.RETURN)
 
@@ -44,9 +49,6 @@ class oto_moto_search(unittest.TestCase):
         search_button = driver.find_element_by_xpath(
             "//button[@class='ds-button ds-width-full']")
         search_button.click()
-
-        wait.until(EC.element_to_be_clickable(
-            (By.CLASS_NAME, 'offer-title__link')))
 
         self.assert_quote("BMW Seria 3")
 
@@ -68,12 +70,19 @@ class oto_moto_search(unittest.TestCase):
             "//ul[@id='select2-order-select-gallery-results']/li[3]")
         lowest_price.click()
 
-        wait.until(EC.visibility_of_element_located((By.ID, "siteWrap")))
+        pictures = driver.find_element_by_xpath(
+            "//body/div[@id='siteWrap']/div[@id='listContainer']/section[@id='body-container']/div[2]/div[1]/div[1]/div[1]/div[5]/article[1]/div[1]/a[1]/img[1]")
 
-        wait.until(EC.element_to_be_clickable(
-            (By.CLASS_NAME, 'offer-title__link')))
+        wait.until(EC.staleness_of(pictures))
 
         self.assert_quote("BMW Seria 3")
+
+        price_details = driver.find_element_by_class_name(
+            "offer-item__price")
+        price = price_details.find_element_by_xpath(".//span[1]/span[1]").text
+        price = price.replace(" ", "")
+
+        self.assertEqual('1490', price)
 
     def tear_down(self):
         self.driver.quit()
