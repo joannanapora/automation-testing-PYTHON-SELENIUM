@@ -105,7 +105,6 @@ class oto_moto_search(unittest.TestCase):
         price = first_price_details.find_element_by_xpath(
             ".//span[1]/span[1]").text
         price = price.replace(" ", "")
-        print("Price of first quote: ", price)
 
         second_price_details = driver.find_elements_by_xpath(
             "//div[contains(@class, 'offer-item__price')]")[1]
@@ -115,12 +114,11 @@ class oto_moto_search(unittest.TestCase):
         price_two = second_price_details.find_element_by_xpath(
             ".//span[1]/span[1]").text
         price_two = price_two.replace(" ", "")
-        print("Price of second quote: ", price_two)
 
         # checking if SORTED CORRECTLY \/\/\/
 
         self.assertLessEqual(int(price), int(price_before_sort))
-        self.assertLessEqual(int(price), int(price2))
+        self.assertLessEqual(int(price), int(price_two))
 
     def tear_down(self):
         self.driver.quit()
