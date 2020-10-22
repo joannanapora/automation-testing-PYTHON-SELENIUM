@@ -60,8 +60,14 @@ class oto_moto_search(unittest.TestCase):
         cookies = driver.find_element_by_class_name("cookiesBarClose")
         cookies.click()
 
-        show_list = driver.find_element_by_xpath(
-            "//body/div[@id='siteWrap']/div[@id='listContainer']/div[@id='tabs-container']/div[1]/div[1]/form[1]/span[1]/span[1]/span[1]")
+        price_before = driver.find_element_by_class_name("offer-item__price")
+        price_before_sort = price_before.find_element_by_xpath(
+            ".//span[1]/span[1]").text
+        price_before_sort = price_before_sort.replace(" ", "")
+        print("Price of first quote before sort:", price_before_sort)
+
+        show_list = driver.find_element_by_id(
+            "select2-order-select-gallery-container")
         show_list.click()
 
         wait.until(EC.element_to_be_clickable(
@@ -77,12 +83,23 @@ class oto_moto_search(unittest.TestCase):
 
         self.assert_quote("BMW Seria 3")
 
-        price_details = driver.find_element_by_class_name(
+        first_price_details = driver.find_element_by_class_name(
             "offer-item__price")
-        price = price_details.find_element_by_xpath(".//span[1]/span[1]").text
+        price = first_price_details.find_element_by_xpath(
+            ".//span[1]/span[1]").text
         price = price.replace(" ", "")
+        print("Price of first quote: ", price)
 
-        self.assertEqual('1490', price)
+        second_price_details = driver.find_elements_by_xpath(
+            "//div[contains(@class, 'offer-item__price')]")[1]
+
+        price2 = second_price_details.find_element_by_xpath(
+            ".//span[1]/span[1]").text
+        price2 = price2.replace(" ", "")
+        print("Price of second quote: ", price2)
+
+        # checking if sorts correctly
+        self.assertLessEqual(int(price), int(price2))
 
     def tear_down(self):
         self.driver.quit()
