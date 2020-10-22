@@ -11,11 +11,20 @@ import unittest
 
 
 class oto_moto_search(unittest.TestCase):
+    
+    def assert_quote(self,title):
+        quote_after_sort = self.driver.find_element_by_class_name(
+            "offer-title__link")
+        self.assertIn(title, quote_after_sort.text)
+
     def setUp(self):
         self.driver = Chrome()
+        self.wait = WebDriverWait(self.driver, 10)
 
     def test_search_in_oto_moto(self):
         driver = self.driver
+        wait = self.wait
+
         driver.get("https://otomoto.pl")
         self.assertIn("OTOMOTO", driver.title)
 
@@ -23,7 +32,7 @@ class oto_moto_search(unittest.TestCase):
         brand.send_keys("BMW")
         brand.send_keys(Keys.RETURN)
 
-        wait = WebDriverWait(driver, 10)
+        
         model = wait.until(EC.element_to_be_clickable(
             (By.ID, 'filter_enum_model')))
         model.send_keys("seria 3")
@@ -39,8 +48,7 @@ class oto_moto_search(unittest.TestCase):
         wait.until(EC.element_to_be_clickable(
             (By.CLASS_NAME, 'offer-title__link')))
 
-        quote1 = driver.find_element_by_class_name("offer-title__link")
-        self.assertIn("BMW Seria 3", quote1.text)
+        self.assert_quote("BMW Seria 3")
 
         wait.until(EC.element_to_be_clickable(
             (By.CLASS_NAME, "select2-selection__arrow")))
@@ -64,9 +72,8 @@ class oto_moto_search(unittest.TestCase):
 
         wait.until(EC.element_to_be_clickable(
             (By.CLASS_NAME, 'offer-title__link')))
-        quote_after_sort = driver.find_element_by_class_name(
-            "offer-title__link")
-        self.assertIn("BMW Seria 3", quote_after_sort.text)
+
+        self.assert_quote("BMW Seria 3")
 
     def tear_down(self):
         self.driver.quit()
