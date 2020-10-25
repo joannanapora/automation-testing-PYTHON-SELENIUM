@@ -5,6 +5,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 import pymysql.cursors
 import unittest
+import HtmlTestRunner
 
 # export PATH=$PATH:/Users/porczi/Downloads/chromedriver
 
@@ -166,10 +167,10 @@ class oto_moto_search(unittest.TestCase):
         try:
             with connection.cursor() as cursor:
                 for i in quotes_details:
-                    sql = "CREATE TABLE IF NOT EXISTS OtoMoto.bmw (title varchar(50) , PLN varchar(50), id varchar(50), location varchar(50), region varchar(50), img varchar(500))"
+                    sql = "CREATE TABLE IF NOT EXISTS OtoMoto.bmw (title varchar(50) , price varchar(50), id varchar(50), location varchar(50), region varchar(50), img varchar(500))"
                     cursor.execute(sql)
                     # Create a new record
-                    sql = "INSERT INTO OtoMoto.bmw (title, PLN, id, location, region, img) VALUES (%s, %s, %s, %s, %s, %s)"
+                    sql = "INSERT INTO OtoMoto.bmw (title, price, id, location, region, img) VALUES (%s, %s, %s, %s, %s, %s)"
                     cursor.execute(
                         sql, (i["title"], i["price"], i["ID"], i["location"], i["region"], i["img_src"]))
                     connection.commit()
@@ -181,4 +182,5 @@ class oto_moto_search(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(testRunner=HtmlTestRunner.HTMLTestRunner(
+        output='.', report_title="sorting by lowest price"))
